@@ -1,10 +1,17 @@
+const {
+    newProduct,
+    allProducts,
+    getSingleProduct,
+    updateProduct,
+    deleteProduct,}
+    = require("../controllers/ProductControllers");
 
-const { newProduct } = require('../../controllers/Productcontroller');
-
-const router=require("express").Router();
-
-router.route('/addproduct').post(newProduct);
-
-
+const express=require("express")
+const router= express.Router()
+// /admin in the route bec only admin can CREATE PRODUCT
+router.route('/admin/product/new').post(newProduct);
+router.route('/products').get(allProducts);
+router.route('/product/:id').get(getSingleProduct);
+router.route('/admin/product/:id').put(updateProduct).delete(deleteProduct);
 module.exports=router;
 // imp to e=import controller nd express

@@ -15,14 +15,16 @@ connectDatabase();
 
 const seedProducts = async () => {
 try{
+    await ProductCollection.deleteMany();
+    console.log("products deleted");
     await ProductCollection.insertMany(Data);
     console.log('products inteserted');
     // exiting process means dont run again n again.. also for this process.exit u need to
     // import dotenv file... bec process comes from therre
-    // process.exit();
+    process.exit();
 }catch(error){
     console.log(error);
-    // process.exit();
+    process.exit();
 }
 }
 seedProducts();
