@@ -8,10 +8,10 @@ const {
 
 const express=require("express")
 const router= express.Router()
-// /admin in the route bec only admin can CREATE PRODUCT
+// /admin/ bec only admin can CREATE PRODUCT
 router.route('/admin/product/new').post(newProduct);
 router.route('/products').get(allProducts);
 router.route('/product/:id').get(getSingleProduct);
 router.route('/admin/product/:id').put(updateProduct).delete(deleteProduct);
 module.exports=router;
-// imp to e=import controller nd express
+// imp to import controller and express
