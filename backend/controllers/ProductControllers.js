@@ -1,26 +1,27 @@
 
+const CatchAsyncerror = require('../middlewares/CatchAsyncerror.js')
 const Products = require('../models/Products.js')
 const ErrorHandler = require('../Utils/ErrorHandler.js')
 
 // create new product /app/v1/product/new
-exports.newProduct = async(req,res,next)=>{
+exports.newProduct = CatchAsyncerror( async(req,res,next)=>{
    const product= await Products.create(req.body)
 res.json({
     success: true,
     product,
-})}
+})})
 
 // get all products
-exports.allProducts =  async(req,res,next) =>{
+exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
     const product = await Products.find()
     res.json({
         success:true,
         NumberofProfucts: product.length,
         product,
     })
-}
+})
 // products. is a collection // get single product(using id)
-exports.getSingleProduct =  async(req,res,next) =>{
+exports.getSingleProduct = CatchAsyncerror(async(req,res,next) =>{
 const product= await Products.findById(req.params.id);
 if(!product){
 return next(
@@ -30,10 +31,10 @@ res.json({
     success: true,
     product,
 })
-}
+})
 
 // update a product // first find to check if the product exists or not
-exports.updateProduct = async (req, res, next) => {
+exports.updateProduct = CatchAsyncerror(async (req, res, next) => {
     let product = await Products.findById(req.params.id);
     if (!product)
       return next(
@@ -49,11 +50,11 @@ exports.updateProduct = async (req, res, next) => {
       success: true,
       product,
     });
-  };
+  })
   
 
 // delete a product
-exports.deleteProduct= async (req,res,next) => {
+exports.deleteProduct= CatchAsyncerror(async (req,res,next) => {
     const product = await Products.findById(req.params.id)
         if(!product){
             return next(
@@ -64,4 +65,4 @@ await product.remove();
 res.json({success:true,
 message:"product deleted"
 });
-}
+})
