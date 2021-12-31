@@ -1,8 +1,7 @@
-
 const CatchAsyncerror = require('../middlewares/CatchAsyncerror.js')
 const Products = require('../models/Products.js')
 const ErrorHandler = require('../Utils/ErrorHandler.js')
-
+const APIFeatures = require('../utils/apiFeatures');
 // create new product /app/v1/product/new
 exports.newProduct = CatchAsyncerror( async(req,res,next)=>{
    const product= await Products.create(req.body)
@@ -11,9 +10,14 @@ res.json({
     product,
 })})
 
-// get all products
+// get all products ..APIFeatures will be used ni get all products only
 exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
-    const product = await Products.find()
+  const resPerpage = 4;
+  const apiFeatures = new APIFeatures(Products.find(),req.query)
+  .search()
+  .filter()
+  .pagination(resPerpage);
+    const product = await apiFeatures.query;
     res.json({
         success:true,
         NumberofProfucts: product.length,
