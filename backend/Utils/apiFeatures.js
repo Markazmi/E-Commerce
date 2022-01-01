@@ -41,7 +41,7 @@ pagination(resPerPage){
     // 4*1=4 means skip first 4 products when we r on page 2 and then show next 4 elements
     // ON EACH(4) PAGE WE WANT 4 PRODUCTS
     this.query = this.query.limit(resPerPage).skip(skip);
-    // We are putting condition on the Collection (this.query) that on each page we want to limit to 4 products and then skip whatever it is
+    // We are putting condition on the Collection (this.query)that on each page we want to limit to 4 products and then skip whatever it is
     // according to the calculation
     return this;
 
