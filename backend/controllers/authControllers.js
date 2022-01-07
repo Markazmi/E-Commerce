@@ -72,18 +72,18 @@ if(!matchPassword){
 sendToken(user,200,res);
 });
 
-exports.logout=((req,res,next)=>{
-const options = {
-    expires:new Date(Date.now()),
-    httpOnly:true,
-}
-//  when the user leaves w ehave to make the token null
-res.cookie('token',null,options);
-res.json({
-    success:true,
-    message:"logged out"
-})
-})
+// exports.logout=CatchAsyncErrors(async(req,res,next)=>{
+// const options = {
+//     expires:new Date(Date.now()),
+//     httpOnly:true,
+// }
+// //  when the user leaves w ehave to make the token null
+// res.cookie('token',null,options);
+// res.json({
+//     success:true,
+//     message:"logged out"
+// })
+// })
 
 
 

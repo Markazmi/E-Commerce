@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 // use validator to check if the email is validator
 const validator = require('validator')
-
+const crypto = require('crypto');
+const { reset } = require('nodemon/lib/config');
 const userScehma = new mongoose.Schema({
 name:{
     type: String,
@@ -42,4 +43,17 @@ resetPasswordToken: String,
 resetPasswordExpire: Date,
 
 })
+// generate password reset token
+userScehma.methods.getresetPasswordToken = function(){
+    // generate token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    this.resetPasswordToken=crypto.createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+    // set token expire time
+    this.resetPasswordExpire=Date.now()+30*60*1000;
+    return resetToken;
+}
 module.exports = mongoose.model('User', userScehma);
