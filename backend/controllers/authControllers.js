@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator')
 // const JWT=require('jsonwebtoken');
 const sendToken = require('../Utils/jwtToken.js');
+const sendEmail = require('../Utils/sendEmail.js');
 
 exports.register = CatchAsyncErrors( async(req,res,next) =>{
     const {name,email,password} = req.body;
@@ -71,19 +72,53 @@ if(!matchPassword){
 
 sendToken(user,200,res);
 });
+// forgot password (doing it before logout)
+exports.forgotPassword=CatchAsyncErrors(async(req,res,next)=>{
+const user = await User.findOne({email:req.body.email})
+if(!user){
+    return next (new ErrorHandler('User not found',400))
+}
+    const resetToken=user.getresetPasswordToken();
 
-// exports.logout=CatchAsyncErrors(async(req,res,next)=>{
-// const options = {
-//     expires:new Date(Date.now()),
-//     httpOnly:true,
-// }
-// //  when the user leaves w ehave to make the token null
-// res.cookie('token',null,options);
-// res.json({
-//     success:true,
-//     message:"logged out"
-// })
-// })
+    await user.save({validateBeforeSave:false});
+    
+    // create password url
+    const resetUrl=`${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`;
+const message= `your password reset token is as follows:\n\n${resetUrl} \n\n
+if you have not requested this email, please ignore it`
+try{
+    await sendEmail({
+        email:user.email,
+        subject:`ShopIt password recovery`,
+        message,
+
+    });
+    res.json({
+        success:true,
+        message:`email sent to ${user.email}`
+    })
+
+}catch(error){
+user.getResetPasswordToken = undefined;
+user.getresetPasswordExpire=undefined;
+await user.save({validateBeforeSave:false})
+return next(new ErrorHandler(error.message,400))
+}
+
+});
+
+exports.logout=CatchAsyncErrors(async(req,res,next)=>{
+const options = {
+    expires:new Date(Date.now()),
+    httpOnly:true,
+}
+//  when the user leaves w ehave to make the token null
+res.cookie('token',null,options);
+res.json({
+    success:true,
+    message:"logged out"
+})
+})
 
 
 

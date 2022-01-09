@@ -3,7 +3,7 @@ const CatchAsyncerror = require("./CatchAsyncerror");
 const User=require('../models/User.js')
 const JWT = require('jsonwebtoken')
 exports.IsAuthenticatedUser=CatchAsyncerror(async(req,res,next)=>{
-    const token = req.cookies
+    const {token} = req.cookies
     // if the user doesnot have token (means he didnt signup)
     if(!token){
         return next(new ErrorHandler("login first to aceess the route", 401))
@@ -18,6 +18,7 @@ exports.IsAuthenticatedUser=CatchAsyncerror(async(req,res,next)=>{
 exports.authorizeRoles=(...roles)=>{
     return (req,res,next)=>{
         const {role} = req.user
+        // if the role==admin then do update,create,delete
         if(!roles.includes(role)){
 
             return next(
