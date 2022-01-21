@@ -6,7 +6,9 @@ const validator = require('validator')
 // const JWT=require('jsonwebtoken');
 const sendToken = require('../Utils/jwtToken.js');
 const sendEmail = require('../Utils/sendEmail.js');
+const crypto = require('crypto')
 
+// resgister user
 exports.register = CatchAsyncErrors( async(req,res,next) =>{
     const {name,email,password} = req.body;
 
@@ -27,12 +29,12 @@ if(!isValidPassword){
 // 2) salt: salt is that the package adds X number of characters after the password
 // because if 2 users have keep same password that would be a problem so bcrypt adds
 // a salt number after the user's password
-const hashPassword = await bcrypt.hash(password,10);
+// const hashPassword = await bcrypt.hash(password,10);
 // if the email is unique add it in the user database
 let newUser= await User.create({
 name,
 email,
-password: hashPassword,
+password,
 avatar:{
     public_id:"iht878673",
     url:"hhtp//khfeagbeg",
@@ -43,6 +45,8 @@ avatar:{
 // assigning a token to this particular user (thats why we wrote as newUser._id)
 sendToken(newUser,201,res)
 })
+
+// login user
 exports.login = CatchAsyncErrors( async(req,res,next) =>{
     const {email, password} = req.body
     if(!email||!password){
@@ -107,6 +111,64 @@ return next(new ErrorHandler(error.message,400))
 
 });
 
+
+// reset password
+// get current user profile
+exports.getUserProfile=CatchAsyncErrors(async(req,res,next)=>{
+    const user = await User.findById(req.user.id)
+    res.json({success:true,
+    user})
+})
+
+// update/change old password
+exports.updatePassword = CatchAsyncErrors(async(req,res,next)=>{
+    const user = await User.findById(req.user.id).select('+password')
+
+    const isMatched= await bcrypt.compare(req.body.oldPassword, user.password);
+    if(!isMatched){
+        return next(
+            new ErrorHandler('Password donot match',400)
+        )}
+    user.password = req.body.oldPassword
+    await user.save();
+    sendToken(user,200,res)
+})
+// exports.updatePassword = CatchAsyncErrors(async(req,res,next) =>{
+//     const user = await User.findById(req.user.id).select('+password');
+    
+//     const isMatched = await bcrypt.compare(req.body.oldPassword, user.password);
+//     if (!isMatched) {
+//       return next(new ErrorHandler("Old password doesn't match'", 400));
+//     }
+//     const hashPassword = await bcrypt.hash(req.body.oldpassword,10);
+//     user.password = hashPassword;
+//     await user.save();
+//     sendToken(user, 200, res);
+//   });
+  
+
+// Update profile
+
+exports.updateProfile=CatchAsyncErrors(async(req,res,next)=>{
+    // which fields to update
+const UpdateUser={
+    name: req.body.name,
+    email: req.body.email
+}
+// updatebyidandupdate is used when we want to update more fields.
+await User.findByIdAndUpdate(req.user.id,UpdateUser, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false
+})
+res.json({
+    success:true,
+    message:"User Updated"
+})
+})
+
+
+//  log out user   
 exports.logout=CatchAsyncErrors(async(req,res,next)=>{
 const options = {
     expires:new Date(Date.now()),
@@ -120,6 +182,62 @@ res.json({
 })
 })
 
+// get all users
+exports.getAllUsers=CatchAsyncErrors(async(req,res,next)=>{
+
+    const user= await User.find();
+    res.json({
+        success:true,
+        user,
+    })
+})
+exports.getUserDetails=CatchAsyncErrors(async(req,res,next)=>{
+
+    const user = await User.findById(req.params.id)
+    if(!user){
+    return next(
+        new ErrorHandler('User not found', 400)
+    )}
+
+    res.json({
+        success:true,
+        user,
+    })
+})
 
 
+// admin update's user profile
+exports.UpdateUserProfile = CatchAsyncErrors(async (req,res,next)=>{
+    const newUserData ={
+        name:req.body.name,
+        email:req.body.email,
+        role: req.body.role,
+    }
+    await User.findByIdAndUpdate(req.params.id,newUserData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:false,
+    })
+    res.json({
+        success:true,
+        message:"user updated",
+    })
+
+})
+// delete a users profile
+exports.DeleteUser = CatchAsyncErrors(async (req,res,next) => {
+    const user = await User.findById(req.params.id)
+    if(!user){
+    return next (new ErrorHandler('user not found', 400))
+    }
+    await user.remove()
+
+    res.json({
+        success:true,
+        message:"user deleted"
+    })
+
+
+})
 // remove res.json completely bec we ave written it in other reuable function
+// git push -u origin main

@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 // use validator to check if the email is validator
 const validator = require('validator')
 const crypto = require('crypto');
-const { reset } = require('nodemon/lib/config');
+const bcrypt = require('bcryptjs/dist/bcrypt');
+
 const userScehma = new mongoose.Schema({
 name:{
     type: String,
@@ -42,6 +43,14 @@ createdAt:{
 resetPasswordToken: String,
 resetPasswordExpire: Date,
 
+})
+
+// encrypting password
+userScehma.pre('save',async function(next){
+    if(!this.isModified('password')){
+        next();
+    }
+    this.password = await bcrypt.hash(this.password,10)
 })
 // generate password reset token
 userScehma.methods.getresetPasswordToken = function(){
