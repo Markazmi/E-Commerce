@@ -19,11 +19,10 @@ exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
   .search()
   .filter()
   .pagination(resPerpage);
-    const product = await apiFeatures.query;
+    const products = await apiFeatures.query;
     res.json({
         success:true,
-        NumberofProfucts: product.length,
-        product,
+        products,
     })
 })
 // products. is a collection // get single product(using id)

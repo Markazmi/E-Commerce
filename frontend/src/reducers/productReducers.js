@@ -1,9 +1,10 @@
 import {
 
-    All_PRODUCTS_REQUEST,
+    
     All_PRODUCTS_SUCCESS,
     All_PRODUCTS_FAIL,
-    CLEAR_ERRORS
+    CLEAR_ERRORS,
+    All_PRODUCTS_REQUEST
     
 } from './../constants/productConstants'
 

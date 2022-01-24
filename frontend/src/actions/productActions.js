@@ -1,4 +1,4 @@
-import {axios} from 'axios'
+import axios from 'axios'
 import{
 
     All_PRODUCTS_REQUEST,
@@ -12,6 +12,7 @@ export const getProducts =()=> async(dispatch) =>{
     try{
         dispatch({type:All_PRODUCTS_REQUEST})
         const {data} =await axios("/api/v1/products")
+       console.log(data);
         dispatch({type:All_PRODUCTS_SUCCESS, payload:data})
     }
     catch(error){
