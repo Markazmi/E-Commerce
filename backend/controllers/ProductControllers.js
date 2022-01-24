@@ -14,6 +14,7 @@ res.json({
 
 // get all products ..APIFeatures will be used ni get all products only
 exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
+  // throw new ErrorHandler('Product not found')
   const resPerpage = 4;
   const apiFeatures = new APIFeatures(Products.find(),req.query)
   .search()
