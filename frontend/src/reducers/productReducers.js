@@ -24,7 +24,9 @@ export const productsReducer = (state = {products:[]}, action) =>{
         case All_PRODUCTS_SUCCESS:
             return{
             loading: false,
-            products: action.payload.products
+            products: action.payload.products,
+            productsCount: action.payload.productsCount,
+            resPerPage: action.payload.resPerPage
             }
         case All_PRODUCTS_FAIL:
             return {
@@ -44,7 +46,7 @@ export const productsReducer = (state = {products:[]}, action) =>{
 // state=product??? see in controller and see which variable u used to get data from the database and use the same
 //  variable here!!!!!(for example const product= await Products.findById(req.params.id)) so use variable here
 
-export const SingleProdReducer = ((state = {product:{}}, action)=>{
+export const productDetailsReducer = (state = {product:{}}, action)=>{
     switch (action.type) {
         case PRODUCT_DETAIL_REQUEST:
             return{
@@ -54,12 +56,13 @@ export const SingleProdReducer = ((state = {product:{}}, action)=>{
         case PRODUCT_DETAIL_SUCCESS:
             return{
                 loading:false,
-                product:action.payload.product
+                product:action.payload.product,
+
             }
         case PRODUCT_DETAIL_FAIL:
             return{
                 loading:false,
-                payload: action.payload
+                error: action.payload
             }
         case CLEAR_ERRORS:
             return{
@@ -69,7 +72,7 @@ export const SingleProdReducer = ((state = {product:{}}, action)=>{
         default:
             return state;
     }
-})
+}
 // WHY IS
 // export const SingleProdReducer = ((state = {product:{}}, action)=>{
 // export const productsReducer = (state = {products:[]}, action) =>{

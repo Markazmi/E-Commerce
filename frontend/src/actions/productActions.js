@@ -11,11 +11,11 @@ import{
     
 } from './../constants/productConstants'
 
-export const getProducts =()=> async(dispatch) =>{
+export const getProducts =(keyword='', currentPage=1)=> async(dispatch) =>{
     try{
         dispatch({type:All_PRODUCTS_REQUEST})
         // this route should be same as the one in producrRoutes for getallprodducts
-        const {data} =await axios("/api/v1/products")
+        const {data} =await axios(`/api/v1/products?keyword=${keyword}&page=${currentPage}`)
        console.log(data);
         dispatch({type:All_PRODUCTS_SUCCESS, payload:data})
     }
@@ -24,10 +24,10 @@ export const getProducts =()=> async(dispatch) =>{
 
     }
 }
-export const getSingleProd = () => async(dispatch)=>{
+export const getProductDetails = (id) => async(dispatch)=>{
     try{
         dispatch({type: PRODUCT_DETAIL_REQUEST})
-        const {data} = await axios(`/product/:id`)
+        const {data} = await axios(`/api/v1/product/${id}`)
         dispatch({type: PRODUCT_DETAIL_SUCCESS, payload:data})
 
     }

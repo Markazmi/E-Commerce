@@ -1,15 +1,21 @@
 import { MetaData } from "./MetaData";
 import { Product } from "./product/Product";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {useSelector, useDispatch} from 'react-redux'
 import { getProducts } from "../../actions/productActions";
 import { Loader } from "../Loader";
 import {useAlert} from 'react-alert'
+import Pagination from 'react-js-pagination'
+import {useParams} from 'react-router-dom'
 export const Home = () => {
  const  dispatch=useDispatch();
  const alert = useAlert()
+//  destructure keyword from params 
+ const { keyword} = useParams()
+ const [currentPage, setCurrentPage]=useState(1)
   // these are coming from ptoductReducer file
- const {products,loading,error}=useSelector((state) => state.products)
+ const {products,loading,error,resPerPage,productsCount}=
+ useSelector((state) => state.products)
 
 useEffect(()=>{
 
@@ -18,12 +24,14 @@ useEffect(()=>{
   // if there is an error then it wont go to else part
   // which is displaying products
 // coming from productActions
-dispatch(getProducts())
+dispatch(getProducts(keyword,currentPage))
 
 }
-,[dispatch, error, alert])
+,[dispatch, error, alert, keyword, currentPage])
 
-
+function setCurrentPageNo(pageNumber){
+  setCurrentPage(pageNumber)
+}
   return (
       <>
       {loading ? (<Loader/>) : (
@@ -38,6 +46,22 @@ dispatch(getProducts())
 
           </div>
         </section>
+        <div className="d-flex justify-content-center mt-5">
+          <Pagination 
+          activePage={currentPage}
+          itemsCountPerPage={resPerPage}
+          totalItemsCount={productsCount}
+          onChange={setCurrentPageNo}
+          prevPageText={'Prev'}
+          nextPageText={'Next'}
+          firstPageText={'first'}
+          lastPageText={'last'}
+          itemClass="page-item"
+          linkClass="page-link"
+          
+          
+          />
+        </div>
         </>
       )}
   </>
@@ -48,4 +72,4 @@ dispatch(getProducts())
 // BACKEND => yarn run dev
 // FRONTEND => yarn start
 
-// then only we can fetch products from backend and display in frontend
+// then only we can fetch products from backend and display in frontend+

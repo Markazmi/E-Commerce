@@ -15,20 +15,24 @@ res.json({
 // get all products ..APIFeatures will be used ni get all products only
 exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
   // throw new ErrorHandler('Product not found')
-  const resPerpage = 4;
+  const productsCount= await Products.countDocuments();
+  const resPerPage = 8;
   const apiFeatures = new APIFeatures(Products.find(),req.query)
   .search()
   .filter()
-  .pagination(resPerpage);
+  .pagination(resPerPage);
+ 
     const products = await apiFeatures.query;
     res.json({
         success:true,
+        productsCount,
+        resPerPage,
         products,
     })
 })
 // products. is a collection // get single product(using id)
 exports.getSingleProduct = CatchAsyncerror(async(req,res,next) =>{
-const product= await Products.findById(req.params.id);
+const product= await Products.finsdById(req.params.id);
 if(!product){
 return next(
     new ErrorHandler(`product not found with id ${req.params.id}`, 400)

@@ -18,9 +18,12 @@ export const Product = ({product}) => {
         </h5>
         <div className='ratings mt-auto'>
           <div className='rating-outer'>
-            <div className='rating-inner'></div>
+            <div className='rating-inner' style = {{width: `${(product.rating/5)*100}%`}}>
+
+            </div>
           </div>
-          <span id='no_of_reviews'>{product.Numofreviews} Reviews</span>
+
+          <span id='no_of_reviews'>{product.Numofreveiws} Reviews</span>
         </div>
         <p className='card-text'>{product.price}</p>
        <Link 
