@@ -16,17 +16,20 @@ res.json({
 exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
   // throw new ErrorHandler('Product not found')
   const productsCount= await Products.countDocuments();
-  const resPerPage = 8;
+  const resPerPage = 4;
   const apiFeatures = new APIFeatures(Products.find(),req.query)
   .search()
   .filter()
   .pagination(resPerPage);
  
     const products = await apiFeatures.query;
+    const filteredProductsCount = products.length
+    apiFeatures.pagination(resPerPage)
     res.json({
         success:true,
         productsCount,
         resPerPage,
+        filteredProductsCount,
         products,
     })
 })
