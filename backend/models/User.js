@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 // use validator to check if the email is validator
 const validator = require('validator')
 const crypto = require('crypto');
-const bcrypt = require('bcryptjs/dist/bcrypt');
+const bcrypt = require('bcryptjs');
 
 const userScehma = new mongoose.Schema({
 name:{

@@ -17,7 +17,7 @@ export const Home = () => {
   const [currentPage, setCurrentPage]=useState(1)
   const [price, setPrice] = useState([1,1000])
   const [category, setCategory] = useState('')
-  // const [rating,setRating]= useState(0)
+  const [rate,setRate]= useState(0)
 
  const  dispatch=useDispatch();
  const alert = useAlert()
@@ -35,9 +35,9 @@ useEffect(()=>{
   // if there is an error then it wont go to else part
   // which is displaying products
 // coming from productActions
-dispatch(getProducts(keyword,currentPage, price, category))
+dispatch(getProducts(keyword,currentPage, price, category, rate))
 }
-,[dispatch, error, alert, keyword, currentPage, price, category])
+,[dispatch, error, alert, keyword, currentPage, price, category, rate])
 
 function setCurrentPageNo(pageNumber){
   setCurrentPage(pageNumber)
@@ -113,7 +113,30 @@ const categories = [
                         </ul>
 
                       </div>
-
+                      <hr className='my-3' />
+                      <div className='mt-5'>
+                        <h4 className='mb-3'>Ratings</h4>
+                        <ul className='pl-0'>
+                          {[5, 4, 3, 2, 1].map((star) => (
+                            <li
+                              className='category-li'
+                              key={star}
+                              style={{
+                                cursor: 'pointer',
+                                listStyleType: 'none',
+                              }}
+                              onClick={() => setRate(star)}
+                            >
+                              <div className='rating-outer'>
+                                <div
+                                  className='rating-inner'
+                                  style={{ width: `${star * 20}%` }}
+                                ></div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                   <div className="col-6 col-md-9">

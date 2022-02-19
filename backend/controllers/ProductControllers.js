@@ -20,7 +20,7 @@ exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
   const apiFeatures = new APIFeatures(Products.find(),req.query)
   .search()
   .filter()
-  .pagination(resPerPage);
+  // .pagination(resPerPage);
  
     const products = await apiFeatures.query;
     const filteredProductsCount = products.length
@@ -35,7 +35,7 @@ exports.allProducts =CatchAsyncerror(  async(req,res,next) =>{
 })
 // products. is a collection // get single product(using id)
 exports.getSingleProduct = CatchAsyncerror(async(req,res,next) =>{
-const product= await Products.finsdById(req.params.id);
+const product= await Products.findById(req.params.id);
 if(!product){
 return next(
     new ErrorHandler(`product not found with id ${req.params.id}`, 400)

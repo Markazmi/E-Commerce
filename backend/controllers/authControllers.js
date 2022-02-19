@@ -6,7 +6,10 @@ const validator = require('validator')
 // const JWT=require('jsonwebtoken');
 const sendToken = require('../Utils/jwtToken.js');
 const sendEmail = require('../Utils/sendEmail.js');
-const crypto = require('crypto')
+const crypto = require('crypto');
+const cloudinary=require('cloudinary');
+
+
 
 // resgister user
 exports.register = CatchAsyncErrors( async(req,res,next) =>{
@@ -31,20 +34,25 @@ if(!isValidPassword){
 // a salt number after the user's password
 // const hashPassword = await bcrypt.hash(password,10);
 // if the email is unique add it in the user database
+const result=await cloudinary.v2.uploader.upload(req.body.avatar,{
+    folder: 'avatars',
+    width:150,
+    crop:'scale'
+})
 let newUser= await User.create({
 name,
 email,
 password,
 avatar:{
-    public_id:"iht878673",
-    url:"hhtp//khfeagbeg",
+    public_id:result.public_id,
+    url:result.secure_url,
     // all these 4 fields are required=true in the model
 },
 })
 
 // assigning a token to this particular user (thats why we wrote as newUser._id)
 sendToken(newUser,201,res)
-})
+})          
 
 // login user
 exports.login = CatchAsyncErrors( async(req,res,next) =>{
@@ -87,8 +95,10 @@ if(!user){
     await user.save({validateBeforeSave:false});
     
     // create password url
-    const resetUrl=`${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`;
-const message= `your password reset token is as follows:\n\n${resetUrl} \n\n
+    // const resetUrl=`${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
+
+    const message= `your password reset token is as follows:\n\n${resetUrl} \n\n
 if you have not requested this email, please ignore it`
 try{
     await sendEmail({
@@ -103,8 +113,8 @@ try{
     })
 
 }catch(error){
-user.getResetPasswordToken = undefined;
-user.getresetPasswordExpire=undefined;
+user.resetPasswordToken = undefined;
+user.resetPasswordExpire=undefined;
 await user.save({validateBeforeSave:false})
 return next(new ErrorHandler(error.message,400))
 }
@@ -113,6 +123,37 @@ return next(new ErrorHandler(error.message,400))
 
 
 // reset password
+exports.resetPassword=CatchAsyncErrors(async(req,res,next)=>{
+const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    // resetPasswordExpire: { $gt: Date.now() },
+  });
+console.log(user);
+  if (!user) {
+    return next(
+      new ErrorHandler(
+        'Password reset token is invalid or has been expires',
+        400
+      )
+    );
+  }
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(new ErrorHandler('Password doesn"t match', 400));
+  }
+
+  // set up the new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+  sendToken(user, 200, res);
+});
+
 // get current user profile
 exports.getUserProfile=CatchAsyncErrors(async(req,res,next)=>{
     const user = await User.findById(req.user.id)
@@ -127,9 +168,9 @@ exports.updatePassword = CatchAsyncErrors(async(req,res,next)=>{
     const isMatched= await bcrypt.compare(req.body.oldPassword, user.password);
     if(!isMatched){
         return next(
-            new ErrorHandler('Password donot match',400)
+            new ErrorHandler('Password do not match',400)
         )}
-    user.password = req.body.oldPassword
+    user.password = req.body.password
     await user.save();
     sendToken(user,200,res)
 })
@@ -151,12 +192,25 @@ exports.updatePassword = CatchAsyncErrors(async(req,res,next)=>{
 
 exports.updateProfile=CatchAsyncErrors(async(req,res,next)=>{
     // which fields to update
-const UpdateUser={
+const newUserData={
     name: req.body.name,
     email: req.body.email
 }
+if(req.body.avatar!==''){
+    const user = await User.findById(req.user.id)
+    const image_id=user.avatar.public_id;
+    const res=await cloudinary.v2.uploader.destroy(image_id)
 // updatebyidandupdate is used when we want to update more fields.
-await User.findByIdAndUpdate(req.user.id,UpdateUser, {
+const result=await cloudinary.v2.uploader.upload(req.body.avatar,{
+    folder:'avatars',
+    width:150,
+    crop:'scale'
+})
+newUserData.avatar={
+    public_id:result.public_id,
+    url: result.secure_url
+}}
+await User.findByIdAndUpdate(req.user.id,newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false
