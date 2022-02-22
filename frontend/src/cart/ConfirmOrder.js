@@ -45,7 +45,8 @@ export const ConfirmOrder = () => {
                 <hr />
                 <h4 className="mt-4">Your Cart Items:</h4>
                 {cartItems.map((item)=>(
-                    <>
+                    <div key={item.product}>
+                    
  
                 <hr />
                 <div className="cart-item my-1" key={item.product}>
@@ -68,7 +69,7 @@ export const ConfirmOrder = () => {
                     </div>
                 </div>
                 <hr />
-                </>
+                </div>
                 ))}
             </div>
 			

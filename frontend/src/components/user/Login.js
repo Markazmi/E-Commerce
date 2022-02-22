@@ -15,7 +15,8 @@ export const Login = () => {
     const dispatch = useDispatch()
 
     // state.auth from store
-    const {loading,error, isAuthenticated} = useSelector((state) => state.auth)
+    const {loading,error, isAuthenticated} = useSelector(
+        (state) => state.auth)
 const location= useLocation()
 const redirect=location.search? location.search.split('=')[1]:'/'
     useEffect(()=>{
@@ -27,8 +28,7 @@ const redirect=location.search? location.search.split('=')[1]:'/'
             alert.error(error)
             dispatch(clearErrors())
         }
-        // WHY NO DISPATCHHHH???
-    },[error,alert, isAuthenticated, clearErrors, redirect])
+    },[error,alert, isAuthenticated,dispatch,navigate, redirect])
 // where do we dispatch this way and not in useEffect 
     const submitHandler =(e)=>{
         e.preventDefault()
