@@ -23,6 +23,7 @@ import { ConfirmOrder } from './cart/ConfirmOrder';
 import axios from 'axios';
 import { Payment } from './cart/Payment';
 import { loadStripe } from '@stripe/stripe-js';
+import { OrderSuccess } from './cart/OrderSuccess';
 
 function App() {
   const [stripeApiKey, setStripeApiKey] = useState('')
@@ -75,10 +76,17 @@ function App() {
               <ConfirmOrder/>
             </ProtectedRoutes>
             }/>
+             <Route path='/success' element={
+            <ProtectedRoutes>
+              <OrderSuccess/>
+            </ProtectedRoutes>
+            }/>
+
 
             {stripeApiKey &&(
                <Route path='/payment' 
                element={
+
 
                <Elements stripe={loadStripe(stripeApiKey)}>
                   <ProtectedRoutes>
@@ -87,6 +95,7 @@ function App() {
                 </Elements>
                 }/>
             )}
+           
 
 
             <Route path='/password/forgot' element={<ForgotPassword/>}/>

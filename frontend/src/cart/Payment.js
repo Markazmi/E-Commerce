@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import {useSelector } from 'react-redux'
+import {useDispatch, useSelector } from 'react-redux'
 
 import {
     useStripe,
@@ -13,6 +13,7 @@ import { MetaData } from '../components/layouts/MetaData';
 import { useNavigate } from 'react-router-dom';
 import {useAlert} from 'react-alert'
 import axios from 'axios'
+import { clearErrors, CreateOrderActions } from '../actions/orderActions';
 const options={
     style:{
         base:{
@@ -29,14 +30,33 @@ export const Payment = () => {
   const stripe=useStripe()
   const elements = useElements()
     const {user}=useSelector((state)=> state.auth)
-    // const {shippingInfo, cartItems}=useSelector((state)=> state.cart)
+    const {shippingInfo, cartItems}=useSelector((state)=> state.cart)
+    const {error} =useSelector((state)=> state.newOrder)
+
+    const order ={
+      orderItems: cartItems,
+      shippingInfo,
+    }
     
     const orderInfo= JSON.parse(sessionStorage.getItem('orderItems'))
+    if(orderInfo){
+      
+      order.itemsPrice= orderInfo.itemsPrice
+      order.totalPrice= orderInfo.totalPrice
+      order.shippingPrice= orderInfo.shippingPrice
+      order.taxPrice= orderInfo.taxPrice
+    }
     const paymentData ={
       amount: Math.round(orderInfo.totalPrice * 100),
 
     }
-    useEffect(() => {}, [])
+    const dispatch = useDispatch()
+    useEffect(() => {
+      if(error){
+        alert.error(error)
+        dispatch(clearErrors())
+      }
+    }, [dispatch,error,alert])
     const submitHandler = async (e)=>{
 
       e.preventDefault()
@@ -75,6 +95,11 @@ export const Payment = () => {
       }
       else{
         if(result.paymentIntent.status ==='succeeded'){
+          order.paymentInfo={
+            id: result.paymentIntent.id,
+            status: result.paymentIntent.status
+          }
+          dispatch(CreateOrderActions())
           navigate('/success')
         }
         else{
